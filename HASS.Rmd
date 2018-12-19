@@ -1,0 +1,346 @@
+---
+
+title: "HASS FIRST ATTEMPT"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When dfou execute code within the notebook, the results appear beneath the code. 
+
+Trdf executing this chunk bdf clicking the *Run* button within the chunk or bdf placing dfour cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+hass <- read.csv("2_HASS DATA.csv", stringsAsFactors = FALSE)
+library(tokenizers)
+library(tm)
+library(NLP)
+str(hass)
+#summary(hass)
+```
+Add a new chunk bdf clicking the *Insert Chunk* button on the toolbar or bdf pressing *Ctrl+Alt+I*.
+
+When dfou save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows dfou a rendered HTML copdf of the contents of the editor. Consequentldf, unlike *Knit*, *Preview* does not run andf R code chunks. Instead, the output of the chunk when it was last run in the editor is displadfed.
+
+```{r}
+hass2 <- read.table("2_HASS DATA.csv", header=TRUE, sep=",", stringsAsFactors = FALSE)
+#hass2[1:127,]
+library(stringr)
+library(NLP)
+if(!require(tm)){
+  install.packages("tm")
+  library(tm)}
+library(ggplot2)
+library(RColorBrewer)
+sort2.hass2 <- hass2[order(hass2$dynasty),] #important thing need to do sorting before filtering using subset!!!!!
+sort2.hass2[1:131, ]
+
+x <- hass2$dynasty #dynasty column
+Tang_Data <-subset(hass2, x == "Tang Dynasty")
+print (Tang_Data)
+df <- str_replace_all(Tang_Data$author, "[\r\n]" , "")
+df <- strsplit(c(df), split = ' ')
+df <- gsub("[[:punct:]]", ' ', df)
+df <- gsub("[[:digit:]]", ' ', df)
+final <- as.data.frame(table(df,Tang_Data$theme)) #can afford to add more var to it so you can compute on tableu
+#str (final) in string format
+#print (final) in table format
+names(final) <- c("Author", "Theme","Freq")
+library(ggplot2)
+ggplot(final,aes(x=final$Theme,y=final$Author)) + geom_tile(aes(fill=Freq),colour = "white") + xlab("Themes") + ylab("Author") + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + scale_fill_gradient(low = "darkred", high = "orange")
+write.csv(final,"Theme.csv",row.names = F)
+
+
+
+```
+
+
+```{r}
+final_2 <- as.data.frame(table(df,Tang_Data$poem.type)) #can afford to add more var to it so you can compute on tableu
+#str (final) in string format
+#print (final) in table format
+names(final_2) <- c("Author", "Poem-Type","Freq")
+library(ggplot2)
+ggplot(final_2,aes(x=final_2$'Poem-Type',y=final_2$Author)) + geom_tile(aes(fill=Freq),colour = "white") + xlab("Poem-Type") + ylab("Author") + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + scale_fill_gradient(low = "darkred", high = "white")
+write.csv(final_2,"Poem-Type.csv",row.names = F)
+
+
+
+```
+
+
+
+```{r}
+sort2.hass2 <- hass2[order(hass2$theme),] #important thing need to do sorting before filtering using subset!!!!!
+sort2.hass2[1:131, ]
+x <- hass2$theme #theme column
+Landscape_Data <-subset(hass2, x %in% c("Landscape","Landscape \nFarming and Reclusion","Landscape\nThe Depiction of Things"),  drop = TRUE)
+print(Landscape_Data)
+ld <- str_replace_all(Landscape_Data$author, "[\r\n]" , "")
+Theme <- str_replace_all(Landscape_Data$theme, "[\r\n]" , "")
+Poemtype <- str_replace_all(Landscape_Data$poem.type, "[\r\n]" , "")
+Religion <- str_replace_all(Landscape_Data$religion, "[\r\n]" , "")
+Title <- str_replace_all(Landscape_Data$title, "[\r\n]" , "")
+Dynasty <- str_replace_all(Landscape_Data$dynasty, "[\r\n]" , "")
+ld <- strsplit(c(ld), split = ' ')
+ld <- gsub("[[:punct:]]", ' ', ld)
+Author <- gsub("[[:digit:]]", ' ', ld)
+landscape <- as.data.frame(table(Author,Dynasty,Poemtype,Theme,Religion,Title)) #can afford to add more var to it so you can compute on tableu
+#str (final) in string format
+#print (final) in table format
+print (landscape)
+#names(landscape) <- c("Author", "Poem-Type","Theme","Religion","Title","Freq")
+library(ggplot2)
+write.csv(landscape,"Landscape.csv",row.names = F)
+
+
+
+```
+
+
+
+```{r}
+y <- hass2$dynasty #dynasty column
+f <-subset(hass2, y == "Tang Dynasty")
+fd <- str_replace_all(f$author, "[\r\n]" , "")#fd is your new dataset
+fd <- strsplit(c(fd), split = ' ')
+fd <- gsub("[[:punct:]]", ' ', fd)
+Author <- gsub("[[:digit:]]", ' ', fd)
+Theme <- str_replace_all(f$theme, "[\r\n]" , "")
+Poemtype <- str_replace_all(f$poem.type, "[\r\n]" , "")
+Religion <- str_replace_all(f$religion, "[\r\n]" , "")
+Title <- str_replace_all(f$title, "[\r\n]" , "")
+Dynasty <- str_replace_all(f$dynasty, "[\r\n]" , "")
+final_1 <- as.data.frame(table(Author,Dynasty,Poemtype,Theme,Religion,Title)) #can afford to add more var to it so you can compute on tableu
+#str (final) in string format
+print (final_1) #in table format
+library(ggplot2)
+#ggplot(final,aes(x=Var2,y=df)) + geom_tile(aes(fill=Freq),colour = "white") + xlab("Themes") + ylab("Author") + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + scale_fill_gradient(low = "darkred", high = "orange")
+write.csv(final_1,"hass_cleaned_09122018.csv",row.names = F)
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+text <- c("this is mdf text with a forward slash / and some other text")
+doc_ids <- c(1)
+library(tokenizers)
+if(!require(tm)){
+  install.packages("tm")
+  library(tm)}
+library(ggplot2)
+library(NLP)
+library(stringr)
+demo <- hass$content[1:15]
+demo1 <- hass$content[1:15]
+x <- hass$content[1:15]
+x = str_replace_all(x, "[\r\n]" , "")
+df <- data.frame(doc_id = doc_ids, text = x, stringsAsFactors = FALSE)
+df <- Corpus(VectorSource(df)) #VectorSource
+toSpace <- content_transformer(function (df , pattern ) gsub(pattern, "\t\n\r\v\f\r?", df))
+df <- tm_map(df, content_transformer(tolower))
+df <- tm_map(df, removeNumbers)
+df <- tm_map(df, removePunctuation)
+df <- tm_map(df, removeWords, stopwords("english"))
+df <- tm_map(df, stripWhitespace)
+tdm <- TermDocumentMatrix(df)
+tdmat <- as.matrix(tdm)
+wf <- sort(rowSums(tdmat), decreasing = TRUE)
+d <- data.frame(word = names(wf),freq = wf) #dataframe
+head(d, 50)
+
+if(!require(wordcloud)){
+  install.packages("wordcloud")
+  library(wordcloud)}
+
+set.seed(1234)
+wordcloud(words = d$word, freq = d$freq, min.freq = 1,
+          max.words=200, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+
+  
+
+#barplot(d[1:100,]$freq, las = 2, names.arg = d[1:100,]$word,space = 100,
+#        col ="lightgreen", main ="Most frequent words",
+#        dflab = "Word frequencies")
+
+ggplot(d[1:30,], aes(word, sort(freq))) + geom_bar(stat="identity", fill="pink", colour="green") + coord_flip() +
+theme(legend.position = "top") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+
+tokenizers::tokenize_words(x,simplify = FALSE)
+
+```
+
+
+
+```{r}
+rm(list=ls())
+?Corpus
+hass <- read.csv("2_HASS DATA.csv", stringsAsFactors = FALSE)
+library(tokenizers)
+if(!require(tm)){
+  install.packages("tm")
+  library(tm)}
+library(ggplot2)
+library(NLP)
+str(hass)
+x <- hass$content[1:15]
+?VectorSource
+corpus <- Corpus(VectorSource(x))
+corpus
+
+corpus[[1]]
+as.character(corpus[[1]])
+corpus[[15]]
+as.character(corpus[[15]])
+
+# With the function tm_map, we apply mappings (transformations) to the corpus. 
+?tm_map
+# There is a variety of transformations that we can apply
+getTransformations()
+
+corpus <- tm_map(corpus,content_transformer(tolower))
+
+corpus <- tm_map(corpus, function(x) iconv(enc2utf8(x), sub = "byte"))
+corpus<- tm_map(corpus, content_transformer(function(x)    iconv(enc2utf8(x), sub = "bytes")))
+corpus <- tm_map(corpus,content_transformer(tolower))
+
+# Let's now check a couple of documents
+as.character(corpus[[15]])
+as.character(corpus[[1]])
+
+# 2a. Then, we move on to the stopwords.
+# Here is the list of english stopwords in the tm package
+stopwords("english")
+# let's then remove the stopwords from the corpus
+corpus <- tm_map(corpus,removeWords,stopwords("english"))
+# And ... Let's check a couple of documents
+as.character(corpus[[1]])
+as.character(corpus[[15]])
+#
+# 2b. We now remove the following words: 
+# 'drive', 'driving', 'driver', 'self-driving', 'car', and 'cars'.
+# The reason is that many tweets contain these words,
+# which are probably not going to be a predictor of the polarity of the tweets.
+corpus <- tm_map(corpus,removeWords,c("drive","driving","driver","self-driving","car","cars"))
+# And ... Let's check a couple of documents
+as.character(corpus[[1]])
+as.character(corpus[[15]])
+
+# 3. Remove punctuation
+corpus <- tm_map(corpus,removePunctuation)
+# And ... Let's check a couple of documents
+as.character(corpus[[1]])
+as.character(corpus[[15]])
+
+# 4. Finally, we stem the words using Porter's stemming algorithm. 
+# Note that you may need to load the SnowballC package to use this functionality
+# (R interface to the C libstemmer library that implements Porter's word stemming algorithm).
+if(!require(SnowballC)){
+  install.packages("SnowballC")
+  library(SnowballC)
+}
+
+# 5. We can now create a document-term matrix from the original corpus. 
+# In particular, we have 2664 documents (rows) and 5834 terms (columns). 
+# Out of the 2664*5834 terms, 23879 terms are nonzero while the remaining ones are zero.
+# So, sparisty is close to 100%.
+
+
+#?DocumentTermMatrix
+#dtm <- DocumentTermMatrix(corpus)
+#dtm
+
+
+tdm <- TermDocumentMatrix(corpus)
+tdmat <- as.matrix(tdm)
+wf <- sort(rowSums(tdmat), decreasing = TRUE)
+d <- data.frame(word = names(wf),freq = wf) #dataframe
+head(d, 50)
+
+if(!require(wordcloud)){
+  install.packages("wordcloud")
+  library(wordcloud)}
+
+
+ggplot(d[1:30,], aes(word, sort(freq))) + geom_col(stat="identity", fill="darkred", colour="darkgreen") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+set.seed(1234)
+wordcloud(words = d$word, freq = d$freq, min.freq = 1,
+          max.words=200, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+
+
+
+# <<DocumentTermMatrix (documents: 2664, terms: 5649)>>
+# Non-/sparse entries: 22176/15026760
+# Sparsity           : 100%
+# Maximal term length: 41
+# Weighting          : term frequency (tf)
+#
+# Let's check the first document
+#dtm[1,]
+# <<DocumentTermMatrix (documents: 1, terms: 5649)>>
+# Non-/sparse entries: 5/5644
+# Sparsity           : 100%
+# Maximal term length: 41
+# Weighting          : term frequency (tf)
+# 
+#inspect(dtm[1,]) # The non-zero eterms are Docs, invest, money, place, print, self, and two.
+# We can do this for any documnet, such as no. 2664
+#inspect(dtm[15,])
+
+# 6. An important information we can get is the frequency with which terms appear
+#?findFreqTerms
+# With this function, we find term appearing with frequency lower than 50%
+#findFreqTerms(dtm,lowfreq=50)
+# We can also check the frequency of specific words
+#dtm[,"accid"]
+#dtm[,"awesom"]
+# This part of the analysis is aimed to remove terms that do not appear frequently
+#?removeSparseTerms
+# In this specific case, we remove all terms with at least 99.5% empty entries
+#dtm <- removeSparseTerms(dtm,0.995)
+#dtm # dtm is now a term-document matrix with 2664 documents and 265 terms. 
+# <<DocumentTermMatrix (documents: 2664, terms: 265)>>
+# Non-/sparse entries: 11924/694036
+# Sparsity           : 98%
+# Maximal term length: 10
+# Weighting          : term frequency (tf)
+
+
+######## 2. Mining the Document-Term matrix + Preparing it for model learning
+######## 2. Mining the Document-Term matrix + Preparing it for model learning
+
+
+```
+
+
+
+
+
